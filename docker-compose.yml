@@ -8,8 +8,19 @@ services:
     restart: always
     volumes:
       - ./backend:/app
+      - cache:/app/.cache/
+      - data:/app/data/
     environment:
       - FLASK_ENV=development
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["1"]
+              capabilities: [ gpu ]
   frontend:
     build:
       context: './frontend'
@@ -23,3 +34,5 @@ services:
     restart: always
 volumes:
   node_modules:
+  cache:
+  data:

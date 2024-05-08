@@ -11,7 +11,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code to the working directory
-COPY . .
+COPY diffusion.py /app
+COPY app.py /app
+# COPY pipeline_stable_diffusion_xl.py /opt/conda/envs/diffusion-xl/lib/python3.10/site-packages/diffusers/pipelines/stable_diffusion_xl/
+COPY pipeline_stable_diffusion_xl.py /usr/local/lib/python3.10/site-packages/diffusers/pipelines/stable_diffusion_xl/pipeline_stable_diffusion_xl.py
 
 ENV PYTHONUNBUFFERED 1
 EXPOSE 80

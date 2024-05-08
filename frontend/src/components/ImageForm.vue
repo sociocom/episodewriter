@@ -21,7 +21,12 @@ export default {
     },
     methods: {
         submitForm() {
-            axios.get('/episodewriter/api/dummytest', {responseType: 'blob', cache: false})
+            axios.get('/episodewriter/api/image_generation', {
+                params: {
+                    prompt: this.text
+                },
+                responseType: 'blob', 
+                cache: false})
                 .then(response => {
                     console.log(response);
                     this.imageUrl = URL.createObjectURL(response.data);

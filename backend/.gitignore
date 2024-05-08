@@ -1,0 +1,5 @@
+.cache
+.env
+data
+__pycache__
+output.jpg

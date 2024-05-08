@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  base: '/episodewriter/',
   server: {
     host: true,
     port: 80,

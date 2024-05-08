@@ -1,7 +1,7 @@
 <template>
     <div>
         <form @submit.prevent="submitForm">
-            <label for="text">Enter prompt here:</label>
+            <label for="text">Enter prompt:</label>
             <input type="text" id="text" v-model="text" required>
             <button type="submit">Submit</button>
         </form>
@@ -21,7 +21,7 @@ export default {
     },
     methods: {
         submitForm() {
-            axios.get('http://localhost:5501/dummytest', {responseType: 'blob'})
+            axios.get('/episodewriter/api/dummytest', {responseType: 'blob', cache: false})
                 .then(response => {
                     console.log(response);
                     this.imageUrl = URL.createObjectURL(response.data);

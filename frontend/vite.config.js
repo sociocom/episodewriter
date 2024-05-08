@@ -14,7 +14,15 @@ export default defineConfig({
     port: 80,
     watch: {
       usePolling: true,
-    }
+    },
+    proxy: {
+      "/episodewriter/api": {
+        target: "http://backend:8888",
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/episodewriter/, ''),
+      },
+    },
   },
   resolve: {
     alias: {

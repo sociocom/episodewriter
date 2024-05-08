@@ -6,6 +6,10 @@ services:
     ports:
       - 127.0.0.1:5501:8888
     restart: always
+    volumes:
+      - ./backend:/app
+    environment:
+      - FLASK_ENV=development
   frontend:
     build:
       context: './frontend'
@@ -19,5 +23,3 @@ services:
     restart: always
 volumes:
   node_modules:
-
-

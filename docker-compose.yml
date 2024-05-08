@@ -12,7 +12,7 @@ services:
     ports:
       - 127.0.0.1:5502:80
     volumes:
-      # - ./frontend:/app
+      - ./frontend:/app
       - node_modules:/app/node_modules
     depends_on:
       - backend

@@ -1,7 +1,10 @@
 <template>
-    <div>
+    <div class="">
       <img :src="image" alt="Image from store" v-if="image" />
-      <p>{{ caption }}</p>
+      <p class="caption">
+        {{ caption }}
+      </p>
+      <v-btn class="download-button" color="secondary" :href="image" download="image.jpeg" v-if="image">Download Image</v-btn>
     </div>
   </template>
   
@@ -20,3 +23,19 @@
     },
   };
   </script>
+<style scoped>
+img {
+  height:70vh;
+}
+
+.caption {
+  color: black;
+  text-align: left;
+  font-size: 1.8em;
+}
+
+.download-button {
+  align-self: flex-end;
+}
+
+</style>

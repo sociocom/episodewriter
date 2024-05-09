@@ -2,11 +2,13 @@
 import { RouterLink, RouterView } from 'vue-router'
 import HelloWorld from './components/HelloWorld.vue'
 import ImageForm from './components/ImageForm.vue'
+import ImageCaptionDisplay from './components/ImageCaptionDisplay.vue';
 </script>
 
 <template>
   <header>
     <ImageForm />
+    <ImageCaptionDisplay />
   </header>
 </template>
 

@@ -5,37 +5,42 @@
             <input type="text" id="text" v-model="text" required>
             <button type="submit">Submit</button>
         </form>
-        <img v-if="imageUrl" :src="imageUrl" alt="Image">
     </div>
 </template>
 
 <script>
-import axios from 'axios'
+import axios from 'axios';
+import { ref } from 'vue';
+import { useDataStore } from '@/stores/data.js';
 
 export default {
-    data() {
-        return {
-            text: '',
-            imageUrl: ''
-        };
-    },
-    methods: {
-        submitForm() {
-            axios.get('/episodewriter/api/image_generation', {
-                params: {
-                    prompt: this.text
-                },
-                responseType: 'blob', 
-                cache: false})
-                .then(response => {
-                    console.log(response);
-                    this.imageUrl = URL.createObjectURL(response.data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-    }
+  setup() {
+    const dataStore = useDataStore();
+    const text = ref('');
+    const imageUrl = ref('');
+
+    const submitForm = () => {
+      axios.get('/episodewriter/api/image_generation', {
+        params: {
+          prompt: text.value,
+        },
+        responseType: 'blob',
+        cache: false,
+      })
+      .then(response => {
+        console.log(response);
+        imageUrl.value = URL.createObjectURL(response.data);
+        dataStore.setImage(imageUrl.value);
+        dataStore.setCaption(text.value);
+      });
+    };
+
+    return {
+      text,
+      imageUrl,
+      submitForm,
+    };
+  },
 };
 </script>
 

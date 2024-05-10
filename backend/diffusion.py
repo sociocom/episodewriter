@@ -15,7 +15,7 @@ def load_pipeline():
     pipeline.to("cuda")
     return pipeline
 
-def image_generation(pipeline, prompt="柴犬、カラフルアート"):
-    image = pipeline(prompt=prompt).images[0]
+def image_generation(task_id,pipeline, prompt="柴犬、カラフルアート"):
+    image = pipeline(task_id=task_id, prompt=prompt).images[0]
     image.save("output.jpg")
     return image

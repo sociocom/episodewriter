@@ -56,6 +56,11 @@ from ..pipeline_utils import DiffusionPipeline, StableDiffusionMixin
 from .pipeline_output import StableDiffusionXLPipelineOutput
 
 
+# Track progres using redis
+import redis
+import json
+r = redis.Redis(host='redis', port=6379, db=0)
+
 if is_invisible_watermark_available():
     from .watermark import StableDiffusionXLWatermarker
 
@@ -233,7 +238,6 @@ class StableDiffusionXLPipeline(
         add_watermarker: Optional[bool] = None,
     ):
         super().__init__()
-
         self.register_modules(
             vae=vae,
             text_encoder=text_encoder,
@@ -811,7 +815,7 @@ class StableDiffusionXLPipeline(
         prompt_2: Optional[Union[str, List[str]]] = None,
         height: Optional[int] = None,
         width: Optional[int] = None,
-        num_inference_steps: int = 50,
+        num_inference_steps: int = 25,
         timesteps: List[int] = None,
         denoising_end: Optional[float] = None,
         guidance_scale: float = 5.0,
@@ -840,6 +844,7 @@ class StableDiffusionXLPipeline(
         clip_skip: Optional[int] = None,
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        task_id = None, 
         **kwargs,
     ):
         r"""
@@ -1157,10 +1162,25 @@ class StableDiffusionXLPipeline(
             ).to(device=device, dtype=latents.dtype)
 
         self._num_timesteps = len(timesteps)
+
+        if task_id:
+            progress = {
+                'current_iteration': 0,
+                'total_iterations': self._num_timesteps
+            }
+            r.set(f'task_progress_{task_id}', json.dumps(progress))
         with self.progress_bar(total=num_inference_steps) as progress_bar:
             for i, t in enumerate(timesteps):
                 if self.interrupt:
                     continue
+
+                if task_id:
+                    print(i,timesteps)
+                    progress = {
+                        'current_iteration': i,
+                        'total_iterations': self._num_timesteps,
+                    }
+                    r.set(f'task_progress_{task_id}', json.dumps(progress))
 
                 # expand the latents if we are doing classifier free guidance
                 latent_model_input = torch.cat([latents] * 2) if self.do_classifier_free_guidance else latents
@@ -1218,6 +1238,12 @@ class StableDiffusionXLPipeline(
 
                 if XLA_AVAILABLE:
                     xm.mark_step()
+
+        if task_id:
+            progress = {
+                'current_iteration': self._num_timesteps,
+                'total_iterations': self._num_timesteps,            }
+            r.set(f'task_progress_{task_id}', json.dumps(progress))
 
         if not output_type == "latent":
             # make sure the VAE is in float32 mode, as it overflows in float16

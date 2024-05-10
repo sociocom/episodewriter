@@ -24,7 +24,7 @@ export default {
     const imageUrl = ref('');
 
     const submitForm = () => {
-      axios.get('/episodewriter/api/image_generation', {
+      axios.get('/episodewriter/api/image_generation_task', {
         params: {
           prompt: text.value,
         },

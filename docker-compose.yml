@@ -14,13 +14,6 @@ services:
       - FLASK_ENV=development
     env_file:
       - ./backend/.env
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              device_ids: ["1"]
-              capabilities: [ gpu ]
   frontend:
     build:
       context: './frontend'
@@ -32,7 +25,35 @@ services:
     depends_on:
       - backend
     restart: always
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6379"
+  worker:
+    build: 
+      context: ./backend
+    command: celery -A celery_app worker --pool=solo --loglevel=info
+    volumes:
+      - ./backend:/app
+      - cache:/app/.cache/
+      - data:/app/data/
+      - celery_data:/data
+    env_file:
+      - ./backend/.env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    links:
+      - redis
+    depends_on:
+      - redis
+      - backend
 volumes:
   node_modules:
   cache:
   data:
+  celery_data:
